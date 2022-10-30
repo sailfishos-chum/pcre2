@@ -33,7 +33,7 @@ Source1:        baselibs.conf
 Patch1:         pcre2-multilib.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
-BuildRequires:  gcc-c++
+BuildRequires:  gcc-c++ >= 8.0
 BuildRequires:  bzip2-devel
 BuildRequires:  libedit-devel
 BuildRequires:  libtool
