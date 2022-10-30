@@ -30,7 +30,7 @@ Source1:        baselibs.conf
 #Source3:        %%{name}.keyring
 #Source4:        baselibs.conf
 #PATCH-FIX-OPENSUSE tchvatal@suse.cz upstream thinks it is good idea to use rpath, taken from RH
-Patch1:         pcre2-10.10-multilib.patch
+Patch1:         pcre2-multilib.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  gcc-c++
@@ -47,6 +47,15 @@ as Perl 5.
 
 PCRE2 is a re-working of the original PCRE library to provide an entirely new
 API.
+
+%if "%{?vendor}" == "chum"
+PackagerName: nephros
+Categories:
+ - Library
+Custom:
+  Repo: %{url}
+  PackagingRepo: https://github.com/sailfishos-chum/pcre2
+%endif
 
 %package        devel
 Summary:        A library for Perl-compatible regular expressions
@@ -65,6 +74,16 @@ as Perl 5.
 PCRE2 is a re-working of the original PCRE library to provide an entirely new
 API.
 
+
+%if "%{?vendor}" == "chum"
+PackagerName: nephros
+Categories:
+ - Library
+Custom:
+  Repo: %{url}
+  PackagingRepo: https://github.com/sailfishos-chum/pcre2
+%endif
+
 #%%package        devel-static
 #Summary:        A library for Perl-compatible regular expressions
 #Group:          Development/Libraries/C and C++
@@ -79,6 +98,16 @@ API.
 #API.
 #
 #This package contains static versions of the PCRE2 libraries.
+#
+#%%if "%{?vendor}" == "chum"
+#PackagerName: nephros
+#Categories:
+# - Library
+#Custom:
+#  Repo: %%{url}
+#  PackagingRepo: https://github.com/sailfishos-chum/pcre2
+#%%endif
+
 
 %package -n libpcre2-8-0
 Summary:        A library for Perl-compatible regular expressions
@@ -95,6 +124,15 @@ API.
 This PCRE2 library variant supports 8-bit and UTF-8 strings.
 (See also libpcre2-16 and libpcre2-32)
 
+%if "%{?vendor}" == "chum"
+PackagerName: nephros
+Categories:
+ - Library
+Custom:
+  Repo: %{url}
+  PackagingRepo: https://github.com/sailfishos-chum/pcre2
+%endif
+
 %package -n libpcre2-16-0
 Summary:        A library for Perl-compatible regular expressions
 Group:          System/Libraries
@@ -108,6 +146,16 @@ PCRE2 is a re-working of the original PCRE library to provide an entirely new
 API.
 
 libpcre2-16 supports 16-bit and UTF-16 strings.
+
+%if "%{?vendor}" == "chum"
+PackagerName: nephros
+Categories:
+ - Library
+Custom:
+  Repo: %{url}
+  PackagingRepo: https://github.com/sailfishos-chum/pcre2
+%endif
+
 
 %package -n libpcre2-32-0
 Summary:        A library for Perl-compatible regular expressions
@@ -123,6 +171,16 @@ API.
 
 libpcre2-32 supports 32-bit and UTF-32 strings.
 
+%if "%{?vendor}" == "chum"
+PackagerName: nephros
+Categories:
+ - Library
+Custom:
+  Repo: %{url}
+  PackagingRepo: https://github.com/sailfishos-chum/pcre2
+%endif
+
+
 %package -n libpcre2-posix3
 Summary:        A library for Perl-compatible regular expressions
 Group:          System/Libraries
@@ -137,6 +195,16 @@ API.
 
 pcre2-posix provides a POSIX-compatible API to the PCRE2 engine.
 
+%if "%{?vendor}" == "chum"
+PackagerName: nephros
+Categories:
+ - Library
+Custom:
+  Repo: %{url}
+  PackagingRepo: https://github.com/sailfishos-chum/pcre2
+%endif
+
+
 %package doc
 Summary:        A library for Perl-compatible regular expressions
 Group:          Documentation/HTML
@@ -149,6 +217,16 @@ as Perl 5.
 
 PCRE2 is a re-working of the original PCRE library to provide an entirely new
 API.
+
+%if "%{?vendor}" == "chum"
+PackagerName: nephros
+Categories:
+ - Library
+Custom:
+  Repo: %{url}
+  PackagingRepo: https://github.com/sailfishos-chum/pcre2
+%endif
+
 
 %package tools
 Summary:        A library for Perl-compatible regular expressions
@@ -163,8 +241,17 @@ as Perl 5.
 PCRE2 is a re-working of the original PCRE library to provide an entirely new
 API.
 
+%if "%{?vendor}" == "chum"
+PackagerName: nephros
+Categories:
+ - Library
+Custom:
+  Repo: %{url}
+  PackagingRepo: https://github.com/sailfishos-chum/pcre2
+%endif
+
 %prep
-%autosetup -p1
+%autosetup -p1 -n %{name}-%{version}/upstream
 
 %build
 %define _lto_cflags %{nil}
