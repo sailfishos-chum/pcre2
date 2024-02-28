@@ -40,6 +40,10 @@ BuildRequires:  libtool
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(zlib)
 
+# SFOS 4.6 ships this:
+BuildRequires: sailfish-version < 4.6.0
+Requires: sailfish-version < 4.6.0
+
 %description
 The PCRE2 library is a set of functions that implement regular
 expression pattern matching using the same syntax and semantics
@@ -65,6 +69,8 @@ Requires:       libpcre2-32-0 = %{version}
 Requires:       libpcre2-8-0 = %{version}
 Requires:       libpcre2-posix3 = %{version}
 Requires:       libstdc++-devel
+# SFOS 4.6 ships this:
+Requires: sailfish-version < 4.6.0
 
 %description devel
 The PCRE2 library is a set of functions that implement regular
@@ -112,6 +118,8 @@ Custom:
 %package -n libpcre2-8-0
 Summary:        A library for Perl-compatible regular expressions
 Group:          System/Libraries
+# SFOS 4.6 ships this:
+Requires: sailfish-version < 4.6.0
 
 %description -n libpcre2-8-0
 The PCRE2 library is a set of functions that implement regular
@@ -136,6 +144,8 @@ Custom:
 %package -n libpcre2-16-0
 Summary:        A library for Perl-compatible regular expressions
 Group:          System/Libraries
+# SFOS 4.6 ships this:
+Requires: sailfish-version < 4.6.0
 
 %description -n libpcre2-16-0
 The PCRE2 library is a set of functions that implement regular
@@ -160,6 +170,8 @@ Custom:
 %package -n libpcre2-32-0
 Summary:        A library for Perl-compatible regular expressions
 Group:          System/Libraries
+# SFOS 4.6 ships this:
+Requires: sailfish-version < 4.6.0
 
 %description -n libpcre2-32-0
 The PCRE2 library is a set of functions that implement regular
@@ -184,6 +196,8 @@ Custom:
 %package -n libpcre2-posix3
 Summary:        A library for Perl-compatible regular expressions
 Group:          System/Libraries
+# SFOS 4.6 ships this:
+Requires: sailfish-version < 4.6.0
 
 %description -n libpcre2-posix3
 The PCRE2 library is a set of functions that implement regular
@@ -209,6 +223,8 @@ Custom:
 Summary:        A library for Perl-compatible regular expressions
 Group:          Documentation/HTML
 BuildArch:      noarch
+# SFOS 4.6 ships this:
+Requires: sailfish-version < 4.6.0
 
 %description doc
 The PCRE2 library is a set of functions that implement regular
@@ -232,6 +248,8 @@ Custom:
 Summary:        A library for Perl-compatible regular expressions
 Group:          Productivity/Text/Utilities
 Recommends:     %{name}-doc
+# SFOS 4.6 ships this:
+Requires: sailfish-version < 4.6.0
 
 %description tools
 The PCRE2 library is a set of functions that implement regular
