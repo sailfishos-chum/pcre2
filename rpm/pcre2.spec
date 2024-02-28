@@ -1,352 +1,229 @@
-#
-# spec file for package pcre2
-#
-# Copyright (c) 2022 SUSE LLC
-#
-# All modifications and additions to the file contributed by third parties
-# remain the property of their copyright owners, unless otherwise agreed
-# upon. The license for this file, and modifications and additions to the
-# file, is the same license as for the pristine package itself (unless the
-# license for the pristine package is not an Open Source License, in which
-# case the license is the MIT License). An "Open Source License" is a
-# license that conforms to the Open Source Definition (Version 1.9)
-# published by the Open Source Initiative.
+%define keepstatic 1
 
-# Please submit bugfixes or comments via https://bugs.opensuse.org/
-#
+# Add readline edditing in pcre2test tool
+%bcond_without pcre2_enables_readline
 
+# Disable SELinux-frindly JIT allocator because it seems not to be fork-safe,
+# https://bugs.exim.org/show_bug.cgi?id=1749#c45
+%bcond_with pcre2_enables_sealloc
 
-%global _lto_cflags %{_lto_cflags} -ffat-lto-objects
-Name:           pcre2
-Version:        10.40
-Release:        0
-Summary:        A library for Perl-compatible regular expressions
-License:        BSD-3-Clause
-Group:          Development/Libraries/C and C++
-URL:            https://www.pcre.org
-Source0:        https://github.com/PhilipHazel/pcre2/releases/download/%{name}-%{version}/%{name}-%{version}.tar.bz2
-Source1:        baselibs.conf
-#Source2:        https://github.com/PhilipHazel/pcre2/releases/download/%%{name}-%%{version}/%%{name}-%%{version}.tar.bz2.sig
-#Source3:        %%{name}.keyring
-#Source4:        baselibs.conf
-#PATCH-FIX-OPENSUSE tchvatal@suse.cz upstream thinks it is good idea to use rpath, taken from RH
-Patch1:         pcre2-multilib.patch
+Name:       pcre2
+Version:    10.42
+Release:    1
+Summary:    Perl-compatible regular expression library
+# the library:                          BSD with exceptions
+# pcre2test (linked to GNU readline):   BSD (linked to GPLv3+)
+# COPYING:                              see LICENCE file
+# LICENSE:                              BSD text with exceptions and
+#                                       Public Domain declaration
+#                                       for testdata
+#Bundled
+# src/sljit:                            BSD
+#Not distributed in any binary package
+# aclocal.m4:                           FSFULLR and GPLv2+ with exception
+# ar-lib:                               GPLv2+ with exception
+# cmake/COPYING-CMAKE-SCRIPTS:          BSD
+# compile:                              GPLv2+ with exception
+# config.guess:                         GPLv3+ with exception
+# config.sub:                           GPLv3+ with exception
+# configure:                            FSFUL and GPLv2+ with exception
+# depcomp:                              GPLv2+ with exception
+# INSTALL:                              FSFAP
+# install-sh:                           MIT
+# ltmain.sh:                            GPLv2+ with exception and (MIT or GPLv3+)
+# m4/ax_pthread.m4:                     GPLv3+ with exception
+# m4/libtool.m4:                        FSFUL and FSFULLR and
+#                                       GPLv2+ with exception
+# m4/ltoptions.m4:                      FSFULLR
+# m4/ltsugar.m4:                        FSFULLR
+# m4/ltversion.m4:                      FSFULLR
+# m4/lt~obsolete.m4:                    FSFULLR
+# m4/pcre2_visibility.m4:               FSFULLR
+# Makefile.in:                          FSFULLR
+# missing:                              GPLv2+ with exception
+# test-driver:                          GPLv2+ with exception
+# testdata:                             Public Domain
+License:    BSD-3-Clause
+URL:        https://www.pcre.org/
+Source0:    https://github.com/PCRE2Project/pcre2/releases/download/pcre2-%{version}/pcre2-%{version}.tar.bz2
+# Do no set RPATH if libdir is not /usr/lib
+Patch0:     0001-Fix-multilib.patch
+# Upstream commits:
+# https://github.com/PCRE2Project/pcre2/commit/794245ecc296724b52f5030831e58bedbffa2452
+# https://github.com/PCRE2Project/pcre2/commit/457c0e69a8f78d32bc7d4b6422cd01e396a4cf5d
+Patch1:     0002-match-also-restore-originally-unset-entries-in-recur.patch
+Patch2:     0003-Add-more-examples-fixed-by-300-update-ChangeLog.patch
+
 BuildRequires:  autoconf
 BuildRequires:  automake
-BuildRequires:  gcc-c++ >= 8.0
-BuildRequires:  bzip2-devel
-BuildRequires:  libedit-devel
+BuildRequires:  coreutils
+BuildRequires:  gnupg2
 BuildRequires:  libtool
-BuildRequires:  pkgconfig
-BuildRequires:  pkgconfig(zlib)
+BuildRequires:  make
+%if %{with pcre2_enables_readline}
+BuildRequires:  readline-devel
+%endif
+BuildRequires:  sed
+Provides:       bundled(sljit)
 
 %description
-The PCRE2 library is a set of functions that implement regular
-expression pattern matching using the same syntax and semantics
-as Perl 5.
+PCRE2 is a re-working of the original PCRE (Perl-compatible regular
+expression) library to provide an entirely new API.
 
-PCRE2 is a re-working of the original PCRE library to provide an entirely new
-API.
+PCRE2 is written in C, and it has its own API. There are three sets of
+functions, one for the 8-bit library, which processes strings of bytes, one
+for the 16-bit library, which processes strings of 16-bit values, and one for
+the 32-bit library, which processes strings of 32-bit values. There are no C++
+wrappers. This package provides support for strings in 8-bit and UTF-8
+encodings. Install %{name}-utf16 or %{name}-utf32 packages for the other ones.
 
-%if "%{?vendor}" == "chum"
-PackagerName: nephros
-Categories:
- - Library
-Custom:
-  Repo: %{url}
-  PackagingRepo: https://github.com/sailfishos-chum/pcre2
-%endif
+The distribution does contain a set of C wrapper functions for the 8-bit
+library that are based on the POSIX regular expression API (see the pcre2posix
+man page). These can be found in a library called libpcre2posix. Note that
+this just provides a POSIX calling interface to PCRE2; the regular expressions
+themselves still follow Perl syntax and semantics. The POSIX API is
+restricted, and does not give full access to all of PCRE2's facilities.
 
-%package        devel
-Summary:        A library for Perl-compatible regular expressions
-Group:          Development/Libraries/C and C++
-Requires:       libpcre2-16-0 = %{version}
-Requires:       libpcre2-32-0 = %{version}
-Requires:       libpcre2-8-0 = %{version}
-Requires:       libpcre2-posix3 = %{version}
-Requires:       libstdc++-devel
+%package utf16
+Summary:    UTF-16 variant of PCRE2
+Provides:   bundled(sljit)
+
+%description utf16
+This is PCRE2 library working on UTF-16 strings.
+
+%package utf32
+Summary:    UTF-32 variant of PCRE2
+Provides:   bundled(sljit)
+
+%description utf32
+This is PCRE2 library working on UTF-32 strings.
+
+%package devel
+Summary:    Development files for %{name}
+Requires:   %{name} = %{version}-%{release}
+Requires:   %{name}-utf16 = %{version}-%{release}
+Requires:   %{name}-utf32 = %{version}-%{release}
 
 %description devel
-The PCRE2 library is a set of functions that implement regular
-expression pattern matching using the same syntax and semantics
-as Perl 5.
+Development files (headers, libraries for dynamic linking, documentation)
+for %{name}.  The header file for the POSIX-style functions is called
+pcre2posix.h.
 
-PCRE2 is a re-working of the original PCRE library to provide an entirely new
-API.
+%package static
+Summary:    Static library for %{name}
+Requires:   %{name}-devel = %{version}-%{release}
+Provides:   bundled(sljit)
 
-
-%if "%{?vendor}" == "chum"
-PackagerName: nephros
-Categories:
- - Library
-Custom:
-  Repo: %{url}
-  PackagingRepo: https://github.com/sailfishos-chum/pcre2
-%endif
-
-#%%package        devel-static
-#Summary:        A library for Perl-compatible regular expressions
-#Group:          Development/Libraries/C and C++
-#Requires:       pcre2-devel = %%{version}
-#
-#%%description devel-static
-#The PCRE2 library is a set of functions that implement regular
-#expression pattern matching using the same syntax and semantics
-#as Perl 5.
-#
-#PCRE2 is a re-working of the original PCRE library to provide an entirely new
-#API.
-#
-#This package contains static versions of the PCRE2 libraries.
-#
-#%%if "%{?vendor}" == "chum"
-#PackagerName: nephros
-#Categories:
-# - Library
-#Custom:
-#  Repo: %%{url}
-#  PackagingRepo: https://github.com/sailfishos-chum/pcre2
-#%%endif
-
-
-%package -n libpcre2-8-0
-Summary:        A library for Perl-compatible regular expressions
-Group:          System/Libraries
-
-%description -n libpcre2-8-0
-The PCRE2 library is a set of functions that implement regular
-expression pattern matching using the same syntax and semantics
-as Perl 5.
-
-PCRE2 is a re-working of the original PCRE library to provide an entirely new
-API.
-
-This PCRE2 library variant supports 8-bit and UTF-8 strings.
-(See also libpcre2-16 and libpcre2-32)
-
-%if "%{?vendor}" == "chum"
-PackagerName: nephros
-Categories:
- - Library
-Custom:
-  Repo: %{url}
-  PackagingRepo: https://github.com/sailfishos-chum/pcre2
-%endif
-
-%package -n libpcre2-16-0
-Summary:        A library for Perl-compatible regular expressions
-Group:          System/Libraries
-
-%description -n libpcre2-16-0
-The PCRE2 library is a set of functions that implement regular
-expression pattern matching using the same syntax and semantics
-as Perl 5.
-
-PCRE2 is a re-working of the original PCRE library to provide an entirely new
-API.
-
-libpcre2-16 supports 16-bit and UTF-16 strings.
-
-%if "%{?vendor}" == "chum"
-PackagerName: nephros
-Categories:
- - Library
-Custom:
-  Repo: %{url}
-  PackagingRepo: https://github.com/sailfishos-chum/pcre2
-%endif
-
-
-%package -n libpcre2-32-0
-Summary:        A library for Perl-compatible regular expressions
-Group:          System/Libraries
-
-%description -n libpcre2-32-0
-The PCRE2 library is a set of functions that implement regular
-expression pattern matching using the same syntax and semantics
-as Perl 5.
-
-PCRE2 is a re-working of the original PCRE library to provide an entirely new
-API.
-
-libpcre2-32 supports 32-bit and UTF-32 strings.
-
-%if "%{?vendor}" == "chum"
-PackagerName: nephros
-Categories:
- - Library
-Custom:
-  Repo: %{url}
-  PackagingRepo: https://github.com/sailfishos-chum/pcre2
-%endif
-
-
-%package -n libpcre2-posix3
-Summary:        A library for Perl-compatible regular expressions
-Group:          System/Libraries
-
-%description -n libpcre2-posix3
-The PCRE2 library is a set of functions that implement regular
-expression pattern matching using the same syntax and semantics
-as Perl 5.
-
-PCRE2 is a re-working of the original PCRE library to provide an entirely new
-API.
-
-pcre2-posix provides a POSIX-compatible API to the PCRE2 engine.
-
-%if "%{?vendor}" == "chum"
-PackagerName: nephros
-Categories:
- - Library
-Custom:
-  Repo: %{url}
-  PackagingRepo: https://github.com/sailfishos-chum/pcre2
-%endif
-
+%description static
+Library for static linking for %{name}.
 
 %package doc
-Summary:        A library for Perl-compatible regular expressions
-Group:          Documentation/HTML
-BuildArch:      noarch
+Summary:    Documentation for PCRE2
+BuildArch:  noarch
 
 %description doc
-The PCRE2 library is a set of functions that implement regular
-expression pattern matching using the same syntax and semantics
-as Perl 5.
-
-PCRE2 is a re-working of the original PCRE library to provide an entirely new
-API.
-
-%if "%{?vendor}" == "chum"
-PackagerName: nephros
-Categories:
- - Library
-Custom:
-  Repo: %{url}
-  PackagingRepo: https://github.com/sailfishos-chum/pcre2
-%endif
-
+This is a set of manual pages that document the PCRE2 library the syntax of
+the regular expressions implemented by it.
 
 %package tools
-Summary:        A library for Perl-compatible regular expressions
-Group:          Productivity/Text/Utilities
-Recommends:     %{name}-doc
+Summary:    Auxiliary utilities for %{name}
+# pcre2test (linked to GNU readline):   BSD (linked to GPLv3+)
+License:    BSD and GPLv3+
+Requires:   %{name} = %{version}-%{release}
 
 %description tools
-The PCRE2 library is a set of functions that implement regular
-expression pattern matching using the same syntax and semantics
-as Perl 5.
-
-PCRE2 is a re-working of the original PCRE library to provide an entirely new
-API.
-
-%if "%{?vendor}" == "chum"
-PackagerName: nephros
-Categories:
- - Library
-Custom:
-  Repo: %{url}
-  PackagingRepo: https://github.com/sailfishos-chum/pcre2
-%endif
+Utilities demonstrating PCRE2 capabilities like pcre2grep or pcre2test.
 
 %prep
-%autosetup -p1 -n %{name}-%{version}/upstream
+%autosetup -p1 -n %{name}-%{version}/%{name}
 
 %build
-%define _lto_cflags %{nil}
-# Available JIT archs see sljit/sljitConfig.h
-autoreconf -fiv
-export LDFLAGS="-Wl,-z,relro,-z,now"
-%configure \
-%ifarch %{ix86} x86_64 aarch64 %{arm} ppc ppc64 ppc64le mips sparc s390x
-	    --enable-jit \
-%endif
-	    --enable-static \
-	    --with-link-size=2 \
-	    --with-match-limit=10000000 \
-	    --enable-newline-is-lf \
-	    --enable-pcre2-16 \
-	    --enable-pcre2-32 \
-	    --enable-pcre2grep-libz \
-	    --enable-pcre2grep-libbz2 \
-	    --enable-pcre2test-libedit \
-	    --enable-unicode
-
-%if 0%{?do_profiling}
-  %make_build CFLAGS="%{optflags} %{cflags_profile_generate}"
-  export LANG=POSIX
-  # do not run profiling in parallel for reproducible builds (boo#1040589 boo#1102408)
-  %make_build -j1 CFLAGS="%{optflags} %{cflags_profile_generate}" check
-  %make_build clean
-  %make_build CFLAGS="%{optflags} %{cflags_profile_feedback}"
+%reconfigure \
+    --enable-jit \
+    --enable-pcre2grep-jit \
+    --disable-bsr-anycrlf \
+    --disable-coverage \
+    --disable-ebcdic \
+    --disable-fuzz-support \
+%if %{with pcre2_enables_sealloc}
+    --enable-jit-sealloc \
 %else
-  %make_build CFLAGS="%{optflags}"
+    --disable-jit-sealloc \
 %endif
+    --disable-never-backslash-C \
+    --enable-newline-is-lf \
+    --enable-pcre2-8 \
+    --enable-pcre2-16 \
+    --enable-pcre2-32 \
+    --enable-pcre2grep-callout \
+    --enable-pcre2grep-callout-fork \
+    --disable-pcre2grep-libbz2 \
+    --disable-pcre2grep-libz \
+    --disable-pcre2test-libedit \
+%if %{with pcre2_enables_readline}
+    --enable-pcre2test-libreadline \
+%else
+    --disable-pcre2test-libreadline \
+%endif
+    --enable-percent-zt \
+    --disable-rebuild-chartables \
+    --enable-shared \
+    --disable-silent-rules \
+    --enable-static \
+    --enable-unicode \
+    --disable-valgrind
+%make_build
 
 %install
 %make_install
-mkdir -p %{buildroot}/%{_defaultdocdir}
-mv %{buildroot}%{_datadir}/doc/pcre2 %{buildroot}/%{_defaultdocdir}/pcre2-doc
-#empty dependecy_libs
-find %{buildroot} -type f -name "*.la" -delete -print
 
-%check
-export LANG=POSIX
-%make_build check -j1
+# Get rid of unneeded *.la files
+rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 
-%post -n libpcre2-8-0 -p /sbin/ldconfig
-%postun -n libpcre2-8-0 -p /sbin/ldconfig
-%post -n libpcre2-16-0 -p /sbin/ldconfig
-%postun -n libpcre2-16-0 -p /sbin/ldconfig
-%post -n libpcre2-32-0 -p /sbin/ldconfig
-%postun -n libpcre2-32-0 -p /sbin/ldconfig
-%post -n libpcre2-posix3 -p /sbin/ldconfig
-%postun -n libpcre2-posix3 -p /sbin/ldconfig
+# These are handled by %%doc in %%files
+rm -rf $RPM_BUILD_ROOT%{_docdir}/pcre2
 
-%files -n libpcre2-8-0
+%post -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
+
+%post utf16 -p /sbin/ldconfig
+%postun utf16 -p /sbin/ldconfig
+
+%post utf32 -p /sbin/ldconfig
+%postun utf32 -p /sbin/ldconfig
+
+%files
 %license COPYING LICENCE
-%doc AUTHORS ChangeLog NEWS README
-%{_libdir}/libpcre2-8.so.*
+%{_libdir}/libpcre2-8.so.0*
+%{_libdir}/libpcre2-posix.so.3*
 
-%files -n libpcre2-16-0
-%license LICENCE
-%{_libdir}/libpcre2-16.so.*
-
-%files -n libpcre2-32-0
-%license LICENCE
-%{_libdir}/libpcre2-32.so.*
-
-%files -n libpcre2-posix3
-%license LICENCE
-%{_libdir}/libpcre2-posix.so.*
-
-%files tools
-%license LICENCE
-%{_bindir}/pcre2grep
-%{_bindir}/pcre2test
-%{_mandir}/man1/pcre2grep.1%{?ext_man}
-%{_mandir}/man1/pcre2test.1%{?ext_man}
-
-%files doc
+%files utf16
 %license COPYING LICENCE
-%doc AUTHORS ChangeLog NEWS README
-%doc doc/html doc/*.txt
-%doc %{_defaultdocdir}/pcre2-doc
+%{_libdir}/libpcre2-16.so.0*
+
+%files utf32
+%license COPYING LICENCE
+%{_libdir}/libpcre2-32.so.0*
 
 %files devel
-%license LICENCE
-%{_bindir}/pcre2-config
-%{_includedir}/*
 %{_libdir}/*.so
-%{_libdir}/pkgconfig/libpcre2-8.pc
-%{_libdir}/pkgconfig/libpcre2-16.pc
-%{_libdir}/pkgconfig/libpcre2-32.pc
-%{_libdir}/pkgconfig/libpcre2-posix.pc
-%{_mandir}/man1/pcre2-config.1%{?ext_man}
-%{_mandir}/man3/*%{ext_man}
+%{_libdir}/pkgconfig/*
+%{_includedir}/*.h
+%{_bindir}/pcre2-config
 
-#%%files devel-static
-#%%{_libdir}/*.a
+%files static
+%license COPYING LICENCE
+%{_libdir}/*.a
 
-%changelog
+%files doc
+%defattr(-,root,root,-)
+%license COPYING LICENCE
+%doc AUTHORS ChangeLog NEWS
+%doc doc/*.txt doc/html
+%doc README HACKING ./src/pcre2demo.c
+%{_mandir}/man1/pcre2*
+%{_mandir}/man3/pcre2*
+
+%files tools
+%{_bindir}/pcre2grep
+%{_bindir}/pcre2test
