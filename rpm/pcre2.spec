@@ -1,3 +1,11 @@
+### SFOS 4.6 ships this, so disable building for it:
+%if "%{?vendor}" == "chum"
+%if 0%{?sailfishos_version} >= 40600
+ExclusiveArch: none
+%endif
+%endif
+### the rest below are kept in sync with https://github.com/sailfishos/pcre2
+
 %define keepstatic 1
 
 # Add readline edditing in pcre2test tool
