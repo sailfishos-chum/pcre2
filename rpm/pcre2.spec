@@ -16,6 +16,14 @@
 #
 
 
+# SFOS 4.6 ships this, so disable building for it:
+%if "%{?vendor}" == "chum"
+%if 0%{?sailfishos_version} >= 40600
+ExclusiveArch: none
+%endif
+%endif
+
+
 %global _lto_cflags %{_lto_cflags} -ffat-lto-objects
 Name:           pcre2
 Version:        10.40
@@ -43,12 +51,6 @@ BuildRequires:  pkgconfig(zlib)
 # SFOS 4.6 ships this:
 BuildRequires: sailfish-version < 4.6.0
 Requires: sailfish-version < 4.6.0
-
-%if "%{?vendor}" == "chum"
-%if 0%{?sailfishos_version} >= 40600
-ExcludeOS: linux sailfishos
-%endif
-%endif
 
 %description
 The PCRE2 library is a set of functions that implement regular
