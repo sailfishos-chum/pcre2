@@ -73,6 +73,9 @@ BuildRequires:  readline-devel
 %endif
 BuildRequires:  sed
 Provides:       bundled(sljit)
+# Package names from Chum version <= 10.40
+Obsoletes:      libpcre2-8-0 <= %{version}
+Obsoletes:      libpcre2-posix3 <= %{version}
 
 %description
 PCRE2 is a re-working of the original PCRE (Perl-compatible regular
@@ -95,6 +98,8 @@ restricted, and does not give full access to all of PCRE2's facilities.
 %package utf16
 Summary:    UTF-16 variant of PCRE2
 Provides:   bundled(sljit)
+# Package names from Chum version <= 10.40
+Obsoletes: libpcre2-16-0 <= %{version}
 
 %description utf16
 This is PCRE2 library working on UTF-16 strings.
@@ -102,6 +107,8 @@ This is PCRE2 library working on UTF-16 strings.
 %package utf32
 Summary:    UTF-32 variant of PCRE2
 Provides:   bundled(sljit)
+# Package names from Chum version <= 10.40
+Obsoletes: libpcre2-32-0 <= %{version}
 
 %description utf32
 This is PCRE2 library working on UTF-32 strings.
