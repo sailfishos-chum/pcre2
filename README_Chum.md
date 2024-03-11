@@ -26,3 +26,4 @@ References:
  - https://irclogs.sailfishos.org/logs/%23sailfishos/%23sailfishos.2024-02-27.log.html
  - https://irclogs.sailfishos.org/logs/%23sailfishos/%23sailfishos.2024-02-28.log.html
  - https://github.com/sailfishos/pcre2
+ - https://openrepos.net/content/ade/libpcre2
