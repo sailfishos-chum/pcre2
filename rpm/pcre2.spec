@@ -40,6 +40,14 @@ BuildRequires:  libtool
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(zlib)
 
+### SFOS 4.6 ships this, so disable building for it:
+%if "%{?vendor}" == "chum"
+%if 0%{?sailfishos_version} >= 40600
+ExclusiveArch: none
+%endif
+%endif
+
+
 %description
 The PCRE2 library is a set of functions that implement regular
 expression pattern matching using the same syntax and semantics
